@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Deudas</title>
+    <link rel="stylesheet" href="static/styles.css">
+</head>
+<script>
+    function confirmacion(){
+        var respuesta= confirm("¿Desea continuar con esta acción?");
+        if (respuesta == true){
+            return true;
+        }else{
+            return false;
+        }   
+    }
+    window.onload = function() {
+        const status = "{{ status }}";
+        if (status === "success") {
+            alert("Se realizo exitosamente");
+        } else if (status === "error") {
+            alert("Sucedió un error");
+        }
+    }
+</script>
+
+
+<body>
+    <div class="screen">
+        <div class="download">
+            <div class="shape circle"></div>
+            <div class="shape square"></div>
+
+            <h2>Descargar Información</h2>
+            <p>Presiona el boton para descargar un excel con toda la información.</p>
+            <form action="/Abonos" method="POST" style="text-align: center; margin-top: 20px;">
+                <button class="boton_izquierdo" type="submit">
+                    Abonos
+                </button>
+            </form>
+
+            <form action="/Deudas" method="POST" style="text-align: center; margin-top: 20px;">
+                <button class="boton_izquierdo" type="submit">
+                    Deudas
+                </button>
+            </form>
+        </div>
+        
+        <div class="container">
+            <h3>Gestor de Deudas</h3>
+            <label for="action">Selecciona una acción:</label>
+            <select id="action" onchange="showForm()">
+                <option value="">--Seleccione--</option>
+                <option value="add">Añadir Deudor</option>
+                <option value="delete">Eliminar Deudor</option>
+                <option value="update">Abono</option>
+            </select>
+
+            <!-- Contenedor de formularios para añadir deudor y deuda -->
+            <div id="form-add" style="display: none;">
+                <form id="add-deudor-form" action="/add_deudor" method="POST" onsubmit="return confirmacion()">
+                    <div class="form-container">
+                        <!-- Información del Deudor -->
+                        <div class="form-section">
+                            <div class="form-group">
+                                <label for="name"></label>
+                                <input placeholder="Escribe Nombre" type="text" id="name" name="nombre" required>
+                            </div>
+                            <div class="form-group">
+                                <input placeholder="Escribe Primer Apellido" type="text" id="paterno" name="paterno" required>
+                            </div>
+                            <div class="form-group">
+                                <input placeholder="Escribe Segundo Apellido" type="text" id="materno" name="materno">
+                            </div>
+                            <div class="form-group">
+                                <input placeholder="Escribe Apodo" type="text" id="apodo" name="apodo">
+                            </div>
+                            <div class="form-group">
+                                <input placeholder="Escribe Teléfono" type="text" id="telefono" name="telefono">
+                            </div>
+                        </div>
+
+                        <!-- Información de la Deuda -->
+                        <div class="form-section" id="debt-fields">
+                            <h3>Añadir Deuda</h3>
+                            <div class="form-group">
+                                <label for="fechaInicio">Fecha de Inicio:</label>
+                                <input type="date" id="fechaInicio" name="fechaInicio" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="monto_total">Monto Total:</label>
+                                <input type="number" id="monto_total" name="monto_total" required>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Botones -->
+                    
+                    <button type="submit" id="submit-button">Añadir Deudor y Deuda </button>
+                </form>
+            </div>
+
+            <!-- Formulario para eliminar deudor -->
+            <div id="form-delete" style="display: none;">
+                <h3>Eliminar Deudor</h3>
+                <form action="/Eliminar_deudor" method="post" onsubmit="return confirmacion()">
+                    <input type="hidden" name="action" value="delete">
+                    <label for="delete-method">Buscar por:</label>
+                    <select id="delete-method" name="delete_method" onchange="toggleDeleteFields()">
+                        <option value="">--Seleccione--</option>
+                        <option value="nombre">Nombre Completo</option>
+                        <option value="apodo">Apodo</option>
+                    </select>
+                    
+                    <!-- Campos para nombre completo -->
+                    <div class="form-group" id="delete-fullname-group" style="display: none;">
+                        <input placeholder="Escribe Nombre" type="text" id="first-name-delete" name="nombre">
+                        
+                        <input placeholder="Escribe Apellido Paterno" type="text" id="last-name-delete" name="paterno">
+                        
+                        <input placeholder="Escribe Apellido Materno" type="text" id="maternal-name-delete" name="materno">
+                    </div>
+
+                    <div class="form-group" id="delete-nickname-group" style="display: none;">
+                        
+                        <input placeholder="Escribe Apodo" type="text" id="nickname-delete" name="apodo">
+                    </div>
+                    
+                    <button type="submit">Eliminar</button>
+                </form>
+            </div>
+
+            <!-- Formulario para abono -->
+            <div id="form-update" style="display: none;">
+                <h3>Abono</h3>
+                <form action="/Abono" method="post" onsubmit="return confirmacion()">
+                    <input type="hidden" name="action" value="update">
+                    <label for="update-method">Buscar por:</label>
+                    <select id="update-method" name="update_method" onchange="toggleUpdateFields()">
+                        <option value="">--Seleccione--</option>
+                        <option value="nombre">Nombre Completo</option>
+                        <option value="apodo">Apodo</option>
+                    </select>
+                    <div class="form-container">
+                        <div class="form-group" id="update-name-group" style="display: none;">
+                    
+                            <input placeholder="Escribe Nombre" type="text" id="first-name-update" name="nombre">
+                            
+                            <input placeholder="Escribe Apellido Paterno" type="text" id="last-name-update" name="paterno">
+                            
+                            <input placeholder="Escribe Apellido Materno" type="text" id="maternal-name-update" name="materno">
+                        </div>
+
+
+                        <div class="form-group" id="update-nickname-group" style="display: none;">
+                    
+                            <input placeholder="Escribe Apodo" type="text" id="nickname-update" name="apodo">
+                        </div>
+
+                        <div class="form-section" id="debt-fields">
+                            <div class="form-group">
+                                <label for="fechaInicio">Fecha de Registro:</label>
+                                <input type="date" id="fechaRegistro" name="fechaRegistro" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="monto_abono">Monto Abono:</label>
+                                <input type="number" id="monto_abono" name="monto_abono" required>
+                            </div>
+                        </div>
+                    
+                    </div>
+                    <button type="submit">Modificar</button>
+                </form>
+            </div>
+            
+        </div>
+
+
+
+    <script>
+        function showForm() {
+            document.getElementById("form-add").style.display = "none";
+            document.getElementById("form-delete").style.display = "none";
+            document.getElementById("form-update").style.display = "none";
+            
+            const action = document.getElementById("action").value;
+            if (action === "add") {
+                document.getElementById("form-add").style.display = "block";
+            } else if (action === "delete") {
+                document.getElementById("form-delete").style.display = "block";
+            } else if (action === "update") {
+                document.getElementById("form-update").style.display = "block";
+            }
+        }
+
+        function showDebtFields() {
+            // Mostrar la sección de deuda
+            document.getElementById("debt-fields").style.display = "block";
+            // Ocultar el botón "Continuar para añadir deuda"
+            document.getElementById("continue-button").style.display = "none";
+            // Mostrar el botón "Añadir Deudor y Deuda"
+            document.getElementById("submit-button").style.display = "block";
+        }
+
+        function toggleDeleteFields() {
+            document.getElementById("delete-fullname-group").style.display = "none";
+            document.getElementById("delete-nickname-group").style.display = "none";
+            
+            const deleteMethod = document.getElementById("delete-method").value;
+            if (deleteMethod === "nombre") {
+                document.getElementById('delete-fullname-group').style.display = "block";
+            } else if (deleteMethod === "apodo") {
+                document.getElementById('delete-nickname-group').style.display = "block";
+            }
+        }
+
+        function toggleUpdateFields() {
+            document.getElementById("update-name-group").style.display = "none";
+            document.getElementById("update-nickname-group").style.display = "none";
+            
+            const updateMethod = document.getElementById("update-method").value;
+            if (updateMethod === "nombre") {
+                document.getElementById("update-name-group").style.display = "block";
+            } else if (updateMethod === "apodo") {
+                document.getElementById("update-nickname-group").style.display = "block";
+            }
+        }
+    </script>
+</body>
+</html>
